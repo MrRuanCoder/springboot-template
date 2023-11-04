@@ -1,5 +1,7 @@
 # springboot-template
 
+**controller层和service层代码仅做样例展示，请无视其代码风格**
+
 使用maven工具链
 
 引入web组件，lombok组件
