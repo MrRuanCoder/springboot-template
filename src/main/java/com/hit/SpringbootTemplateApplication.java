@@ -15,8 +15,8 @@ public class SpringbootTemplateApplication {
         SpringApplication.run(SpringbootTemplateApplication.class, args);
     }
 
-//    @Bean
-//    public PasswordEncoder passwordEncoder(){
-//        return new BCryptPasswordEncoder();
-//    }	//密码加密类bean
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }	//密码加密类bean
 }
