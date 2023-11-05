@@ -8,7 +8,7 @@
 
 - 使用FreeMarker模板引擎
 
-- mybatis-plus持久层框架（ 也可用mybatis ）
+- mybatis-plus持久层框架（也可用mybatis）
 
 - FastJSON作为JSON处理库
 
