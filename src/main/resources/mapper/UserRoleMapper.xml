@@ -8,6 +8,5 @@
         FROM t_user_role a
         WHERE
             a.user_id = #{userId}
-
     </select>
 </mapper>
