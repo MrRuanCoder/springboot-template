@@ -43,9 +43,6 @@ public class MySwaggerConfig {
         //第二个参数 "Authorization" 是在请求头中用于携带 Token 的字段名称。根据你的代码中的逻辑，这里使用的是 "Authorization" 字段。
         //第三个参数 "header" 指定了 Token 是通过请求头的方式进行传递。也可以使用其他方式，如 "query" 表示通过查询参数传递 Token。
         return new ApiKey("Authorization", "Authorization", "header");
-//        return new ApiKey("Authorization", "Bearer {token}", "header");
-
-//        return new ApiKey("X-Token", "X-Token", "header");
     }
 
     private SecurityContext securityContext() {
@@ -65,10 +62,10 @@ public class MySwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("通用批发零售业务管理系统接口文档")
-                .description("通用批发零售业务管理系统后端代码--By 阮浩麒")
+                .title("接口文档")
+                .description("接口文档")
                 .version("1.0")
-                .contact(new Contact("spear", "https://www.google.com/", "spearKanojo@outlook.com"))
+                .contact(new Contact("rhq", "https://www.google.com/", "spearKanojo@outlook.com"))
                 .build();
     }
 }

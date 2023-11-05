@@ -11,11 +11,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * class to encapsulate result and return to front-end
- * 
- * @author Edmund_Lai 
- * @email 1191000311@stu.hit.edu.cn 
- * @create 2022-01-06-19:12 
+ * class to encapsulate result and return to front-end（can replace Result class）
+ *
  */
 @JsonSerialize(using = CommonResultSerializer.class)
 @ApiModel(description = "The common result of API")

@@ -43,7 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //
 //        // 结果不为空，并且密码和传入密码匹配，则生成token，并将用户信息存入redis
 //        if(loginUser != null && passwordEncoder.matches(user.getPassword(),loginUser.getPassword())){
-//            // 暂时用UUID, 终极方案是jwt
+//            // 用jwt更好
 //            String key = "user:" + UUID.randomUUID();
 //
 //            // 存入redis
@@ -58,17 +58,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        return null;
 //    }
 
-    @Override       //老逻辑：无密码加密的
+    @Override
     public Map<String, Object> login(User user) {
-        // 根据用户名和密码查询
+
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getUsername,user.getUsername());
         wrapper.eq(User::getPassword,user.getPassword());
         User loginUser = this.baseMapper.selectOne(wrapper);
         // 结果不为空，则生成token，并将用户信息存入redis
         if(loginUser != null){
-            // 暂时用UUID, 终极方案是jwt(用了jwt后可不用redis)
-//            String key = "user:" + UUID.randomUUID();
+
 
             // 存入redis
             loginUser.setPassword(null);        //稍后做加密处理
@@ -88,7 +87,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public Map<String, Object> getUserInfo(String token) {
-        // 根据token获取用户信息，redis
+
 //        Object obj = redisTemplate.opsForValue().get(token);
         User loginUser = null;
         try {
@@ -98,14 +97,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             e.printStackTrace();
         }
 
-        if(loginUser != null){        //做一个反序列化
+        if(loginUser != null){        //反序列化
 //            User loginUser = JSON.parseObject(JSON.toJSONString(obj),User.class);   //obj转化为json字符串
             Map<String, Object> data = new HashMap<>();
             data.put("name",loginUser.getUsername());
-//            data.put("avatar", loginUser.getAvatar());
 
-            // 角色
-            List<String> roleList = this.baseMapper.getRoleNameByUserId(Math.toIntExact(loginUser.getUserId()));//这里转换为int
+            List<String> roleList = this.baseMapper.getRoleNameByUserId(Math.toIntExact(loginUser.getUserId()));
             data.put("roles",roleList);
 
             return data;
@@ -115,6 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public void logout(String token) {
-//        redisTemplate.delete(token);      //redis不要用到注释掉
+//        redisTemplate.delete(token);
     }
+
 }

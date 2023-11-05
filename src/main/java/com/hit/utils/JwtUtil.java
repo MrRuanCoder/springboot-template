@@ -23,7 +23,7 @@ import java.util.UUID;
 public class JwtUtil {
 
     // 有效期
-    private static final long JWT_EXPIRE = 30*60*1000L;  //半小时
+    private static final long JWT_EXPIRE = 30*60*1000L;
     // 令牌秘钥
     public static final String JWT_KEY = "n9vOn7JVDhXrCSyI5FUt6s0FyPLtP9bZ";
 
@@ -58,7 +58,7 @@ public class JwtUtil {
         return body;
     }
 
-    public <T> T parseToken(String token,Class<T> clazz){   //
+    public <T> T parseToken(String token,Class<T> clazz){
         Claims body = Jwts.parser()
                 .setSigningKey(encodeSecret(JWT_KEY))
                 .parseClaimsJws(token)

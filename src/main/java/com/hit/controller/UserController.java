@@ -26,13 +26,13 @@ import java.util.Map;
  * @author Ruan
  * @since 2023-05-31
  */
-@Api(tags = {"用户接口列表"})     //swagger的注解，对 API 接口进行分组和分类
-@RestController     //方法返回的对象会被自动序列化为 JSON 或其他格式的响应数据
+@Api(tags = {"用户接口列表"})      //swagger的注解，对 API 接口进行分组和分类
+@RestController                 //方法返回的对象会被自动序列化为 JSON 或其他格式的响应数据
 @RequestMapping("/sys/user")
-@CrossOrigin       //跨域处理
+@CrossOrigin                    //跨域处理
 public class UserController {
 
-    @Autowired/////
+    @Autowired
     private UserRoleServiceImpl userRoleService;
 
     @Autowired
@@ -42,7 +42,7 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
 //    @ApiOperation("查询所有信息")
-//    @GetMapping("/all")       //修改方法
+//    @GetMapping("/all")       /
 //    public Result<List<User>> getAllUser(){
 //        List<User> list = userService.list();
 //        return Result.success(list,"查询成功");
@@ -53,11 +53,8 @@ public class UserController {
     public Result<List<User>> getAllUser(){
         List<User> list = userService.list();
 
-        // 遍历用户列表
         for (User user : list) {
-            // 根据userid从userrole表中获取对应的roleid
             Long roleid = userRoleService.getRoleIdByUserid(user.getUserId());
-            // 将roleid设置到对应的User对象中
             user.setRoleId(roleid);
         }
 
@@ -77,7 +74,6 @@ public class UserController {
 //    }
 
 
-
     @ApiOperation("用户登录")
     @PostMapping("/login")
     public Result<Map<String,Object>> login(@RequestBody User user){
@@ -86,8 +82,6 @@ public class UserController {
 
         if(data == null) return Result.fail(20002,"用户名或密码错误");
 
-        //要使用自己实现的JwtUtil方法
-        // 根据userid从userrole表中获取对应的roleid
         JwtUtil jwtUtil = new JwtUtil();
 
         //token解码后添加role相关数据
@@ -97,7 +91,8 @@ public class UserController {
 //
 //        Map<String, Object> subClaims = claims.get("sub", Map.class);
 //        int userId = (int) subClaims.get("userId");
-        //一开始无userId，需要自己从token中提取
+
+        //从token中解码userid
         Claims claims = jwtUtil.parseToken(token);
         String subString = claims.getSubject();
         Map<String, Object> subClaims = JSON.parseObject(subString, Map.class);
@@ -106,7 +101,7 @@ public class UserController {
 
         Long roleid = userRoleService.getRoleIdByUserid((long) userId);
 
-//        Claims claims = jwtUtil.parseToken(token); // 使用您的JwtUtil类解析JWT
+//        Claims claims = jwtUtil.parseToken(token); // 使用JwtUtil类解析JWT
 
         claims.put("roleId", roleid);
 
@@ -123,16 +118,16 @@ public class UserController {
     }
 
 
+    @ApiOperation("查询用户信息")
     @GetMapping("/info")
     public Result<Map<String,Object>> getUserInfo(@RequestParam("token") String token){
-        // 根据token获取用户信息，redis
+        // 根据token获取用户信息
         Map<String,Object> data = userService.getUserInfo(token);
         if(data != null){
             return Result.success(data);
         }
         return Result.fail(20003,"登录信息无效，请重新登录");
     }
-
 
     @ApiOperation("登出方法")
     @PostMapping("/logout")
@@ -146,14 +141,14 @@ public class UserController {
     public Result<Map<String,Object>> getUserList(@RequestParam(value = "username",required = false) String username,
                                                   @RequestParam(value = "phone",required = false) String phone,
                                                   @RequestParam(value = "pageNo") Long pageNo,
-                                                  @RequestParam(value = "pageSize") Long pageSize){     //可加一个address，pageno分页，pagesize每页多少条
+                                                  @RequestParam(value = "pageSize") Long pageSize){
 
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();      //条件构造器，构建数据库查询条件，它是通过 Lambda 表达式来实现
         wrapper.eq(StringUtils.hasLength(username),User::getUsername,username);
         wrapper.eq(StringUtils.hasLength(phone),User::getPhone,phone);
         wrapper.orderByDesc(User::getUserId);    //按id降序
 
-        Page<User> page = new Page<>(pageNo,pageSize);  //可查看这个页和上游页
+        Page<User> page = new Page<>(pageNo,pageSize);  //可查看这个页和上游页数据
         userService.page(page,wrapper);
 
         Map<String,Object> data = new HashMap<>();
@@ -164,27 +159,18 @@ public class UserController {
 
     }
 
-//    @ApiOperation("新增用户")
-//    @PostMapping("/add")      //原始
-//    public Result<?> addUser(@RequestBody User user){   //HTTP请求的请求体解析为一个User的java对象
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));   //密码加密
-//        userService.save(user);
-//        return Result.success("新增用户成功");
-//    }
-
     @ApiOperation("新增用户")
-    @PostMapping("/add")      //加上role
-    public Result<?> addUser(@RequestBody User user){   //HTTP请求的请求体解析为一个User的java对象
+    @PostMapping("/add")
+    public Result<?> addUser(@RequestBody User user){
         Long roleId = user.getRoleId();
 
-        user.setRoleId(null);//其实是roleid
+        user.setRoleId(null);
 
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));   //密码加密
+        user.setPassword(passwordEncoder.encode(user.getPassword()));   //密码加密
+
         userService.save(user);
 
-        Long userId = user.getUserId(); // 获取新增的user的id
-
-
+        Long userId = user.getUserId();
 
         UserRole ur = new UserRole();
         ur.setUserId(userId);
@@ -194,7 +180,6 @@ public class UserController {
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId);
 
-//        return Result.success("新增用户成功");
         return Result.success(data,"新增用户成功");
     }
 
@@ -204,26 +189,24 @@ public class UserController {
     @ApiOperation("修改用户信息")
     @PutMapping
     public Result<?> updateUser(@RequestBody User user){
-//        user.setPassword(null);             //需要和前端交互，或改为下面类似使用id的方法(看运行时的语句，就知道缺少了哪些东西（where后面
+//        user.setPassword(null);
         userService.updateById(user);       //已传入的字段如果为空，该字段是不会更新的
+
+        if (user.getUserId() == null) {
+            return Result.fail(20003, "用户ID为空");
+        }
+        userService.updateById(user);
         return Result.success("修改用户成功");
-//        if (user.getUserId() == null) {
-//            return Result.fail(20003, "用户ID为空");
-//        }
-//        userService.updateById(user);
-//        return Result.success("修改用户成功");
     }
 
     @ApiOperation("通过id查询用户数据")
-    @GetMapping("/{id}")    //通过id查到用户数据
+    @GetMapping("/{id}")
     public Result<User> getUserById(@PathVariable("id") Integer id){
         User user = userService.getById(id);
 
-            // 根据userid从userrole表中获取对应的roleid
-            Long roleid = userRoleService.getRoleIdByUserid(user.getUserId());
-            // 将roleid设置到对应的User对象中
-            user.setRoleId(roleid);
+        Long roleid = userRoleService.getRoleIdByUserid(user.getUserId());
 
+        user.setRoleId(roleid);
 
         return Result.success(user);
     }

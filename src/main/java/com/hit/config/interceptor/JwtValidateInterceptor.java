@@ -25,14 +25,14 @@ public class JwtValidateInterceptor implements HandlerInterceptor  {    //token�
     private JwtUtil jwtUtil;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token  = request.getHeader("Authorization");                     //前端token规定可改
+        String token  = request.getHeader("Authorization");
 
-        log.debug(request.getRequestURI() + "需要验证： " + token);                  //日志来打印输出信息
+        log.debug(request.getRequestURI() + "需要验证： " + token);
 
         if (token != null && token.startsWith("Bearer ")) {
             // 移除 Bearer 头部
             token = token.substring(7);
-//            System.out.println(token);
+            System.out.println(token);
         }
 
 
@@ -48,7 +48,7 @@ public class JwtValidateInterceptor implements HandlerInterceptor  {    //token�
         log.debug(request.getRequestURI() + "验证失败，禁止访问");
 
         response.setContentType("application/json;charset=utf-8");
-        Result<Object> fail = Result.fail(20003, "jwt无效，请重新登录");//提示前端（fail静态方法
+        Result<Object> fail = Result.fail(20003, "jwt无效，请重新登录");
         response.getWriter().write(JSON.toJSONString(fail));
 
         return false; // 拦截
