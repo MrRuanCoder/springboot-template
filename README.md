@@ -1,6 +1,6 @@
 # springboot-template
 
-## **controller层和service层代码仅做样例展示，请无视其代码风格**
+### **controller层和service层代码仅做样例展示，请无视其代码风格**
 
 - 使用maven工具链
 - 使用mysql数据库（也可换为其他数据库）
@@ -8,7 +8,7 @@
 
 - 使用FreeMarker模板引擎
 
-- mybatis-plus持久层框架（也可用mybatis）
+- mybatis-plus持久层框架（ 也可用mybatis ）
 
 - FastJSON作为JSON处理库
 
